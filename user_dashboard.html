@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Live Video</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .container {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .video-container {
+            width: 80%; /* Widen the video container */
+            margin: 0 auto;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 600px; /* Adjust video container height */
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        .full-screen-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Dashboard - Live Video</h1>
+        <div class="video-container">
+            <iframe id="liveVideo" src="" frameborder="0"></iframe>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="changeChannel(1)">Channel 1</button>
+            <button class="btn" onclick="changeChannel(2)">Channel 2</button>
+        </div>
+
+        <button class="full-screen-btn" onclick="toggleFullScreen()">Full Screen</button>
+    </div>
+
+    <script>
+        // Default IP addresses for ESP32 Cameras
+        const ipAddresses = {
+            1: "http://192.168.162.10",  // IP for Channel 1
+            2: "http://192.168.162.7"    // IP for Channel 2
+        };
+
+        // Function to get query parameters from the URL
+        function getQueryParameter(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Set the video stream based on the selected channel
+        function loadStream() {
+            const channel = getQueryParameter('channel');  // Get 'channel' from query params
+            const iframe = document.getElementById('liveVideo');
+            
+            if (channel == "1") {
+                iframe.src = ipAddresses[1];  // Stream for Channel 1
+            } else if (channel == "2") {
+                iframe.src = ipAddresses[2];  // Stream for Channel 2
+            } else {
+                iframe.src = "";  // No stream for invalid or missing channel
+                alert("Invalid or missing channel parameter.");
+            }
+        }
+
+        // Change the channel based on the button click
+        function changeChannel(channelNumber) {
+            const iframe = document.getElementById('liveVideo');
+            
+            if (ipAddresses[channelNumber]) {
+                iframe.src = ipAddresses[channelNumber];  // Change the iframe source to the selected channel
+            } else {
+                console.log("Invalid channel number");
+            }
+        }
+
+        // Full-screen toggle
+        function toggleFullScreen() {
+            var iframe = document.getElementById('liveVideo');
+            if (iframe.requestFullscreen) {
+                iframe.requestFullscreen();
+            } else if (iframe.mozRequestFullScreen) { // Firefox
+                iframe.mozRequestFullScreen();
+            } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari and Opera
+                iframe.webkitRequestFullscreen();
+            } else if (iframe.msRequestFullscreen) { // IE/Edge
+                iframe.msRequestFullscreen();
+            }
+        }
+
+        // Load the stream on page load (if the channel is passed in the URL)
+        window.onload = loadStream;
+    </script>
+</body>
+</html>
